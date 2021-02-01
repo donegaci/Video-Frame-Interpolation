@@ -4,9 +4,8 @@ clear
 load test.mat
 
 % define coordinates of interest
-x = 620;
-y = 339;
-
+x = 592;
+y = 441;
 % center of kernel
 x_center = 26;
 y_center = 26;
@@ -15,71 +14,45 @@ y_center = 26;
 % transpose the vertical vector
 kernel1 = vert1(1,:,y,x)' * hor1(1,:,y,x);
 kernel2 = vert2(1,:,y,x)' * hor2(1,:,y,x);
-
 s = 100 / max(max(abs([kernel1 kernel2])));
-
 ker1 = kernel1 * s + 128;
 ker2 = kernel2 * s + 128;
 
-[gx, gy] = gradient(kernel1);
-GtG = [sum(sum(gx.^2)), sum(sum(gx.*gy));...
-       sum(sum(gx.*gy)), sum(sum(gy.^2))] / (51*51);
+
+% kernel1
+[CoM_x1, CoM_y1, CoM_vector1] = getCenterOfMass(kernel1);
+[max_abs_x1, max_abs_y1, max_abs_vector1] = getMaxAbs(kernel1);
+% kernel1
+[CoM_x2, CoM_y2, CoM_vector2] = getCenterOfMass(kernel2);
+[max_abs_x2, max_abs_y2, max_abs_vector2] = getMaxAbs(kernel2);
 
 
-% calculate eigenvectors and eigen values
-[e_vec1, e_val1] = eig(GtG);
-[e_vec2, e_val2] = eig(kernel2);
-d1 = diag(e_val1);
-[d1_sort, id1] = sort(d1, 'descend');
-d2 = diag(e_val2);
-[d2, id2] = sort(d2, 'descend');
-
-%plot kernels
+% plot kernels
+% kernel 1
 figure()
 subplot(2,1,1)
 image(ker1)
-% axis image
 colormap(gray(256))
 hold on;
 contour(ker1)
+quiver(CoM_x1, CoM_y1, CoM_vector1(1), CoM_vector1(2), 0,'r', 'LineWidth',3)
+quiver(max_abs_x1, max_abs_y1, max_abs_vector1(1), max_abs_vector1(2), 0,'b', 'LineWidth',3)
+title('Kernel_1 (backward)')
 
-% % Plot EVERY eigenvector
-% for i = 1: length(e_vec1)
-%     quiver(x_center, y_center, e_vec1(1,i), e_vec1(2,i), 10, 'LineWidth',3);
-% end
-
-% % Plot first two eigen vectors only
-quiver(x_center, y_center, e_vec1(1,2), e_vec1(2,2),0,'k', 'LineWidth',3);
-quiver(x_center, y_center, e_vec1(1,1), e_vec1(2,1),0,'r', 'LineWidth',3);
-% Combine the average direction
-u1 = (e_vec1(1,1)+e_vec1(1,2));
-v1 = (e_vec1(2,2)+e_vec1(2,1));
-quiver(x_center, y_center, u1, v1, 0, 'LineWidth',3);
-% title('Kernel_1 (backward)')
+% kernel 2
 subplot(2,1,2)
 image(ker2)
 colormap(gray(256))
 hold on;
+contour(ker2)
+quiver(CoM_x2, CoM_y2, CoM_vector2(1), CoM_vector2(2), 0,'r', 'LineWidth',3)
+quiver(max_abs_x2, max_abs_y2, max_abs_vector2(1), max_abs_vector2(2), 0,'b', 'LineWidth',3)
+% title('Kernel_2 (forward)')
 
-% % Plot EVERY eigenvector
-% for i = 1: length(e_vec1)
-%         quiver(x_center, y_center, e_vec2(1,i), e_vec2(2,i), 10, 'LineWidth',3);
-% end
-
-quiver(x_center, y_center, e_vec2(1,id2(2)), e_vec2(2,id2(1)), 10000, 'k', 'LineWidth',3);
-% quiver(x_center, y_center, e_vec2(1,1), e_vec2(2,1), 10, 'r', 'LineWidth',3);
-% % Combine the average direction
-% u2 = (e_vec2(1,1)+e_vec2(1,2));
-% v2 = (e_vec2(2,2)+e_vec2(2,1));
-% quiver(x_center, y_center, u2, v2,10, 'LineWidth',3);
-title('Kernel_2 (forward)')
 
 % define some place you want to look at
-% sy = y-25 : y+25;
-% sx = x-25 : x+25;
 sy = 300 : 450;
 sx = 550 : 700;
-
 
 % plot interpolated image and GT image
 % rearrange order so that channels is last
@@ -97,14 +70,34 @@ plot(x, y, 'xr', 'Linewidth', 10)
 title('Interpolated image')
 
 
-% % Read in the previous image
-% name = sprintf('./HD_dataset/HD720p_GT/parkrun_frames/frame009.png');
-% prev_frame = imread(name);
-% 
-% % Plot the kernel over the receptive field of the previus image
-% figure()
-% image(sx, sy, prev_frame(sy, sx, :))
-% title('Frame 9 (prev frame)')
-% hold on;
-% k_overlay = image(sx, sy, ker1);
-% set(k_overlay, 'AlphaData', ker1)
+
+% get gradient of kernel
+function GtG = getGradient(kernel)
+    [gx, gy] = gradient(kernel);
+    GtG = [sum(sum(gx.^2)), sum(sum(gx.*gy));...
+           sum(sum(gx.*gy)), sum(sum(gy.^2))] / (51*51);
+end
+
+
+% calculate center of mass of kernel
+function [x, y, vector] = getCenterOfMass(kernel)
+    x_center = 26;
+    y_center = 26;
+    cols = 1 : size(kernel, 2); % columns
+    rows = 1 : size(kernel, 1); % rows
+    [X, Y] = meshgrid(cols, rows);
+    mean_kernel = mean(kernel(:));
+    x = mean(kernel(:) .* X(:)) / mean_kernel;
+    y = mean(kernel(:) .* Y(:)) / mean_kernel;
+    vector = [x_center y_center]-[x y];
+end
+
+
+% calculate the max absoloute value of kernel
+function [x, y, vector] = getMaxAbs(kernel)
+    x_center = 26;
+    y_center = 26;
+    max_val = max(max(abs(kernel)));
+    [y, x] = find(kernel==max_val);
+    vector = [x_center y_center]-[x y];
+end
