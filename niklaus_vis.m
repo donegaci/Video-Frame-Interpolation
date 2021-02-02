@@ -4,8 +4,8 @@ clear
 load test.mat
 
 % define coordinates of interest
-x = 592;
-y = 441;
+x = 610;
+y = 336;
 % center of kernel
 x_center = 26;
 y_center = 26;
@@ -51,8 +51,8 @@ quiver(max_abs_x2, max_abs_y2, max_abs_vector2(1), max_abs_vector2(2), 0,'b', 'L
 
 
 % define some place you want to look at
-sy = 300 : 450;
-sx = 550 : 700;
+sy = 330 : 360;
+sx = 575 : 675;
 
 % plot interpolated image and GT image
 % rearrange order so that channels is last
@@ -68,36 +68,3 @@ image(sx, sy, im2uint8(rgb(sy, sx, :)));
 hold on;
 plot(x, y, 'xr', 'Linewidth', 10)
 title('Interpolated image')
-
-
-
-% get gradient of kernel
-function GtG = getGradient(kernel)
-    [gx, gy] = gradient(kernel);
-    GtG = [sum(sum(gx.^2)), sum(sum(gx.*gy));...
-           sum(sum(gx.*gy)), sum(sum(gy.^2))] / (51*51);
-end
-
-
-% calculate center of mass of kernel
-function [x, y, vector] = getCenterOfMass(kernel)
-    x_center = 26;
-    y_center = 26;
-    cols = 1 : size(kernel, 2); % columns
-    rows = 1 : size(kernel, 1); % rows
-    [X, Y] = meshgrid(cols, rows);
-    mean_kernel = mean(kernel(:));
-    x = mean(kernel(:) .* X(:)) / mean_kernel;
-    y = mean(kernel(:) .* Y(:)) / mean_kernel;
-    vector = [x_center y_center]-[x y];
-end
-
-
-% calculate the max absoloute value of kernel
-function [x, y, vector] = getMaxAbs(kernel)
-    x_center = 26;
-    y_center = 26;
-    max_val = max(max(abs(kernel)));
-    [y, x] = find(kernel==max_val);
-    vector = [x_center y_center]-[x y];
-end
