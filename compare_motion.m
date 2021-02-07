@@ -3,21 +3,22 @@ close all
 clear
 
 % frame to be inspected
+name = 'adobe_720p_240fps_1';
 frame = 76;
 
-load(sprintf('adobe_data/niklaus/frame_%04d.mat', frame))
-load(sprintf('adobe_data/memc/frame_%04d.mat', frame))
+load(sprintf('data/niklaus/%s/frame_%04d.mat', name, frame))
+load(sprintf('data/memc/%s/frame_%04d.mat', name, frame))
 
 % tidy up variables
 memc_motion = motion;
 clear('motion', 'img_interp', 'img', 'occlusion', 'filter')
 
 % read ground truth frames and interpolated frames
-prev_frame = imread(sprintf('adobe_data/ground_truth/frame_%04d.png', frame-1));
-next_frame = imread(sprintf('adobe_data/ground_truth/frame_%04d.png', frame+1));
-gt_frame = imread(sprintf('adobe_data/ground_truth/frame_%04d.png', frame));
-niklaus_interp = imread(sprintf('adobe_data/niklaus/frame_%04d.png', frame));
-memc_interp = imread(sprintf('adobe_data/memc/frame_%04d.png', frame));
+prev_frame = imread(sprintf('data/ground_truth/%s/frame_%04d.png', name, frame-1));
+next_frame = imread(sprintf('data/ground_truth/%s/frame_%04d.png', name, frame+1));
+gt_frame = imread(sprintf('data/ground_truth/%s/frame_%04d.png', name, frame));
+niklaus_interp = imread(sprintf('data/niklaus/%s/frame_%04d.png', name, frame));
+memc_interp = imread(sprintf('data/memc/%s/frame_%04d.png', name, frame));
 
 % define coordinates of interest
 x = 700;

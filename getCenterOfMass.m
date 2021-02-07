@@ -8,5 +8,5 @@ function [x, y, vector] = getCenterOfMass(kernel)
     mean_kernel = mean(abs(kernel(:)));
     x = mean(abs(kernel(:)) .* X(:)) / mean_kernel;
     y = mean(abs(kernel(:)) .* Y(:)) / mean_kernel;
-    vector = [x_center y_center]-[x y];
+    vector = [x y] - [x_center y_center];
 end
