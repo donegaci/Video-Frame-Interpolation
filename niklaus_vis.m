@@ -4,8 +4,8 @@ clear
 load test.mat
 
 % define coordinates of interest
-x = 610;
-y = 336;
+x = 616;
+y = 338;
 % center of kernel
 x_center = 26;
 y_center = 26;
@@ -37,7 +37,10 @@ hold on;
 contour(ker1)
 quiver(CoM_x1, CoM_y1, CoM_vector1(1), CoM_vector1(2), 0,'r', 'LineWidth',3)
 quiver(max_abs_x1, max_abs_y1, max_abs_vector1(1), max_abs_vector1(2), 0,'b', 'LineWidth',3)
+legend(["Contour plot", "C of M vector", "Max Abs vector"])
 title('Kernel_1 (backward)')
+axis image
+
 
 % kernel 2
 subplot(2,1,2)
@@ -47,7 +50,8 @@ hold on;
 contour(ker2)
 quiver(CoM_x2, CoM_y2, CoM_vector2(1), CoM_vector2(2), 0,'r', 'LineWidth',3)
 quiver(max_abs_x2, max_abs_y2, max_abs_vector2(1), max_abs_vector2(2), 0,'b', 'LineWidth',3)
-% title('Kernel_2 (forward)')
+title('Kernel_2 (forward)')
+axis image
 
 
 % define some place you want to look at
@@ -63,8 +67,10 @@ subplot(2,1,1)
 gt_img = imread('./HD_dataset/HD720p_GT/parkrun_frames/frame010.png');
 image(sx, sy, (gt_img(sy, sx, :)))
 title('GT image')
+axis image
 subplot(2,1,2)
 image(sx, sy, im2uint8(rgb(sy, sx, :)));
 hold on;
 plot(x, y, 'xr', 'Linewidth', 10)
 title('Interpolated image')
+axis image
