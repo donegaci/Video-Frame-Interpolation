@@ -4,5 +4,5 @@ function [x, y, vector] = getMaxAbs(kernel)
     y_center = 26;
     max_val = max(max(abs(kernel)));
     [y, x] = find(abs(kernel)==max_val);
-    vector = [x_center y_center]-[x y];
+    vector = [x y] - [x_center y_center];
 end
