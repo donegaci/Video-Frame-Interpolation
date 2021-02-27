@@ -2,28 +2,29 @@ close all
 clear
 
 % Frame to inspect
-frame_num = 10;
+file = 'sintel_alley2';
+frame_num = 42;
 
 % Load in saved motion vectors 
-load (sprintf('data/memc/parkrun/frame_%04d.mat', frame_num))
-load (sprintf('data/niklaus/parkrun/frame_%04d.mat', frame_num))
-load (sprintf('data/ground_truth/parkrun/gt_forw_frame_%04d.mat', frame_num))
+load (sprintf('data/memc/%s/frame_%04d.mat', file, frame_num))
+load (sprintf('data/niklaus/%s/frame_%04d.mat', file, frame_num))
+load (sprintf('data/ground_truth/%s/gt_forw_frame_%04d.mat', file, frame_num))
 
 % tidy up variables
 memc_motion = motion;
 clear('motion', 'img_interp', 'img', 'occlusion', 'filter')
 
 % read in picture
-name = sprintf('data/ground_truth/parkrun/frame_%04d.png', frame_num-1);
+name = sprintf('data/ground_truth/%s/frame_%04d.png', file, frame_num-1);
 prev_frame = imread(name);
-name = sprintf('data/ground_truth/parkrun/frame_%04d.png', frame_num+1);
+name = sprintf('data/ground_truth/%s/frame_%04d.png', file, frame_num+1);
 next_frame = imread(name);
-name = sprintf('data/ground_truth/parkrun/frame_%04d.png', frame_num);
+name = sprintf('data/ground_truth/%s/frame_%04d.png', file, frame_num);
 gt_frame = imread(name);
 
 % define some place you want to look at
-sy = 330 : 355;
-sx = 590 : 660;
+sy = 250 : 544; % sintel alley door
+sx = 1 : 100;
 
 % gt flow vectors
 gt_u_forward = gt_flow(:,:,1);
@@ -82,7 +83,7 @@ title(sprintf('Frame number %d', frame_num));
 hold on;
 X = ones(length(sy), 1) * sx;
 Y = sy' * ones(1, length(sx));
-n = 4;
+n = 10;
 quiver(X(1 : n : end, 1 : n : end), Y(1 : n : end, 1 : n : end),...
   u_memc(sy(1 : n : end, 1 : n : end), sx(1 : n : end, 1 : n : end)),...
   v_memc(sy(1 : n : end, 1 : n : end), sx(1 : n : end, 1 : n : end)), 0, 'r-',...
